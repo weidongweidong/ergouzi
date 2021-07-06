@@ -16,6 +16,5 @@ echo "mvn -f pom.xml clean package"
 mvn -f pom.xml clean package
 
 echo "cd /spring-cloud-ergouzi/eureka-server/target"
-cd target
-
-java -jar eureka-server-0.0.1.jar
+#cd target
+#java -jar eureka-server-0.0.1.jar
