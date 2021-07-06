@@ -6,14 +6,9 @@ rm -rf /root/.m2/repository
 echo "unzip /maven-repository/repository.zip -d /root/.m2/"
 unzip /maven-repository/repository.zip -d /root/.m2/
 
-echo "mv -f /spring-cloud-ergouzi/settings-docker.xml  /root/.m2/settings-docker.xml"
-mv -f /spring-cloud-ergouzi/settings-docker.xml  /root/.m2/settings-docker.xml
+#echo "mv -f /spring-cloud-ergouzi/settings-docker.xml  /root/.m2/settings-docker.xml"
+#mv -f /spring-cloud-ergouzi/settings-docker.xml  /root/.m2/settings-docker.xml
 
-
-#echo "rm -rf src/main/resources/application.yml"
-#rm -rf src/main/resources/application.yml
-#echo "mv bootstrap.properties src/main/resources/bootstrap.properties"
-#mv bootstrap.properties src/main/resources/bootstrap.properties
 
 cd ..
 
