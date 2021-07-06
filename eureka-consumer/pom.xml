@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ergouzi</groupId>
     <artifactId>eureka-consumer</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>eureka-consumer</name>
     <description>消费者</description>
     <properties>

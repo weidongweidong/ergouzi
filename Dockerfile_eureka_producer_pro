@@ -2,7 +2,7 @@ FROM maven:3.5-jdk-8
 
 COPY ./ /spring-cloud-ergouzi
 RUN chmod a+x /spring-cloud-ergouzi/eureka-producer/entrypoint.sh
-EXPOSE 8765
+EXPOSE 8762
 WORKDIR /spring-cloud-ergouzi/eureka-producer/
 CMD /spring-cloud-ergouzi/eureka-producer/entrypoint.sh pro
 

@@ -5,4 +5,3 @@ RUN chmod a+x /spring-cloud-ergouzi/eureka-server/entrypoint.sh
 EXPOSE 8761
 WORKDIR /spring-cloud-ergouzi/eureka-server/
 CMD /spring-cloud-ergouzi/eureka-server/entrypoint.sh pro
-
