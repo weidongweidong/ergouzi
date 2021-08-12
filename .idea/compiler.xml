@@ -7,8 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-server" />
-        <module name="eureka-consumer" />
         <module name="eureka-producer" />
+        <module name="eureka-consumer" />
       </profile>
     </annotationProcessing>
   </component>
