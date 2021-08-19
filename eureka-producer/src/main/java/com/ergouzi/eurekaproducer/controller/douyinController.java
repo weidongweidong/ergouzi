@@ -88,6 +88,7 @@ public class douyinController {
                 String o = palyUrl.getString("src");
                 jsonObject.put("DESC",desc);
                 jsonObject.put("URL","https:"+o);
+                jsonObject.put("TYPE","video");
                 return jsonObject;
             }
             String location = doc.location();
@@ -121,6 +122,7 @@ public class douyinController {
                 array.add(url_list.get(0));
             }
             jsonObject.put("URL" ,array);
+            jsonObject.put("TYPE","images");
             return jsonObject;
 
         }catch (Exception e){
