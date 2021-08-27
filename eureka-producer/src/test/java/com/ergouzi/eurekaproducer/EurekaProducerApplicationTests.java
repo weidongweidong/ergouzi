@@ -1,6 +1,7 @@
 package com.ergouzi.eurekaproducer;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -79,4 +80,18 @@ class EurekaProducerApplicationTests {
 		is.close();
 	}
 
+
+
+	@Test
+	public void text(){
+		JSONObject addressObj = new JSONObject();
+
+		addressObj.put("省份","北京");
+		addressObj.put("城市","北京");
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("name","chenweidong");
+		jsonObject.put("address" , addressObj);
+		System.out.println(jsonObject);
+	}
 }

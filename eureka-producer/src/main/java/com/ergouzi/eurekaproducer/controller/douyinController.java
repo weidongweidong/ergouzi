@@ -81,8 +81,25 @@ public class douyinController {
             if(!"".equals(json)){
                 String str = URLDecoder.decode(json,"UTF-8");
                 JSONObject parse = JSON.parseObject(str);
-                JSONObject C_14 = parse.getJSONObject("C_14");
-                JSONObject detail = C_14.getJSONObject("aweme").getJSONObject("detail");
+                JSONObject detail = null;
+                for(String str1 : parse.keySet()){
+                    Object o = parse.get(str1);
+                    if(!(o instanceof  JSONObject)){
+                        continue;
+                    }
+                    JSONObject jsonObject1 = parse.getJSONObject(str1);
+                    if(jsonObject1==null){
+                        continue;
+                    }
+                    JSONObject aweme = jsonObject1.getJSONObject("aweme");
+                    if(aweme == null){
+                        continue;
+                    }
+                    detail = aweme.getJSONObject("detail");
+                }
+                if(detail ==null){
+                    return null;
+                }
                 String desc = detail.getString("desc");
                 JSONObject palyUrl = (JSONObject) detail.getJSONObject("video").getJSONArray("playAddr").get(1);
                 String o = palyUrl.getString("src");
