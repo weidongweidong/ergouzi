@@ -3,10 +3,16 @@ package com.ergouzi.eurekaproducer.controller;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 /**
  * @description: 定时任务
@@ -14,17 +20,109 @@ import java.io.IOException;
  * @create: 2021-08-05 16:03
  **/
 
-@RestController
+@Configuration
+@EnableScheduling   // 2.开启定时任务
 public class task {
 
-    @GetMapping("/price")
-    public void getPrice() throws IOException {
-        String url  = "https://www.qqw21.com/katongtouxiang/";
-        Document doc = Jsoup.connect(url).get();
-        Elements select = doc.select(".lazy");
 
-        String src = select.attr("src");
-        System.out.print(src);
+    @Value("${spring.resources.static-locations}")
+    public String locations;
 
+    //定时删除 本地文件
+    @Scheduled(fixedRate = 1000 * 10)
+    private void configureTasks() {
+        System.out.println("locations : "+ locations);
+        System.err.println("执行定时任务时间: " + LocalDateTime.now());
+        boolean b = deleteDirectory(locations);
+        System.out.println("定时删除 本地文件 执行结果"+ b);
+    }
+
+
+
+    /**
+     *  根据路径删除指定的目录或文件，无论存在与否
+     *@param sPath  要删除的目录或文件
+     *@return 删除成功返回 true，否则返回 false。
+     */
+    public static boolean deleteFolder(String sPath) {
+        boolean flag = false;
+        File file = new File(sPath);
+        // 判断目录或文件是否存在
+        if (!file.exists()) {  // 不存在返回 false
+            return flag;
+        } else {
+            // 判断是否为文件
+            if (file.isFile()) {  // 为文件时调用删除文件方法
+                return deleteFile(sPath);
+            } else {  // 为目录时调用删除目录方法
+                return deleteDirectory(sPath);
+            }
+        }
+    }
+
+
+    /**
+     * 删除单个文件
+     * @param   sPath    被删除文件的文件名
+     * @return 单个文件删除成功返回true，否则返回false
+     */
+    public static boolean deleteFile(String sPath) {
+        boolean flag = false;
+        File file = new File(sPath);
+        // 路径为文件且不为空则进行删除
+        if (file.isFile() && file.exists()) {
+            file.delete();
+            flag = true;
+        }
+        return flag;
+    }
+    /**
+     * 删除目录（文件夹）以及目录下的文件
+     * @param   sPath 被删除目录的文件路径
+     * @return  目录删除成功返回true，否则返回false
+     */
+    public static boolean deleteDirectory(String sPath) {
+        boolean flag;
+        //如果sPath不以文件分隔符结尾，自动添加文件分隔符
+        if (!sPath.endsWith(File.separator)) {
+            sPath = sPath + File.separator;
+        }
+        File dirFile = new File(sPath);
+        //如果dir对应的文件不存在，或者不是一个目录，则退出
+        if (!dirFile.exists() || !dirFile.isDirectory()) {
+            return false;
+        }
+        flag = true;
+        //删除文件夹下的所有文件(包括子目录)
+        File[] files = dirFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            //删除子文件
+            if (files[i].isFile()) {
+                flag = deleteFile(files[i].getAbsolutePath());
+                if (!flag) break;
+            } //删除子目录
+            else {
+                flag = deleteDirectory(files[i].getAbsolutePath());
+                if (!flag) break;
+            }
+        }
+        if (!flag) return false;
+        //删除当前目录
+        if (dirFile.delete()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public static void createFolder(String path){
+        File dirFile  =   new  File(path);
+        if ( ! (dirFile.exists())  &&   ! (dirFile.isDirectory())) {
+            boolean  creadok  =  dirFile.mkdirs();
+            if (creadok) {
+                System.out.println( " ok:创建文件夹成功！ " );
+            } else {
+                System.out.println( " err:创建文件夹失败！ " );
+            }
+        }
     }
 }

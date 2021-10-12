@@ -4,9 +4,14 @@ server:
 spring:
   application:
     name: eureka-producer
+  mvc:
+    static-path-pattern: /images/*
+  resources:
+    static-locations: static
 eureka:
   instance:
     hostname: 127.0.0.1 #本地
   client:
     service-url:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+
