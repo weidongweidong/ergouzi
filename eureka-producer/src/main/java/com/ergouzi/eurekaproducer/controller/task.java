@@ -29,7 +29,7 @@ public class task {
     public String locations;
 
     //定时删除 本地文件
-    @Scheduled(fixedRate = 1000 * 10)
+    @Scheduled(fixedRate = 1000 * 60 * 60)
     private void configureTasks() {
         System.out.println("locations : "+ locations);
         System.err.println("执行定时任务时间: " + LocalDateTime.now());

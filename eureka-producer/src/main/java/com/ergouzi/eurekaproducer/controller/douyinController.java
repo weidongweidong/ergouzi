@@ -48,31 +48,21 @@ public class douyinController {
             if(jsonObject ==null){
                 return ResultUtil.error("解析抖音错误");
             }
-            //保存
-            Object url1 = jsonObject.get("URL");
-            JSONArray urls;
-            String fileZui;
-            if(url1 instanceof String){
+            if(jsonObject.getString("TYPE").equals("images")){
+                //保存
+                JSONArray urls = jsonObject.getJSONArray("URL");
+                String fileZui = ".jpg";
                 JSONArray array = new JSONArray();
-                array.add(url1);
-                urls = array;
-                fileZui = ".mp4";
-            }else{
-                urls = jsonObject.getJSONArray("URL");
-                fileZui = ".jpg";
+                String path = "static/";
+                for(int i=0 ;i < urls.size();i++){
+                    String urlString = (String) urls.get(i);
+                    UUID uuid = UUID.randomUUID();
+                    String id = uuid.toString();
+                    download(urlString, id+fileZui,path);
+                    array.add("https://cloud.chenweidong.top/producer/images/"+id + fileZui);
+                }
+                jsonObject.put("URL",array);
             }
-
-            JSONArray array = new JSONArray();
-            String path = "static/"; //
-            for(int i=0 ;i < urls.size();i++){
-                String urlString = (String) urls.get(i);
-                UUID uuid = UUID.randomUUID();
-                String id = uuid.toString();
-                download(urlString, id+fileZui,path);
-                array.add("https://cloud.chenweidong.top/producer/images/"+id + fileZui);
-            }
-            jsonObject.put("URL",array);
-
             return ResultUtil.success("success", jsonObject);
         }catch (Exception e){
             return ResultUtil.error("视频解析错误 ");
