@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ergouzi.eurekaproducer.utils.ResultUtil;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -50,9 +51,9 @@ public class douyinController {
             //保存
             JSONArray urls = jsonObject.getJSONArray("URL");
             JSONArray array = new JSONArray();
-            String path = this.getClass().getResource("/").getPath()+ "static/"; //.replace("%e5%ad%a6%e4%b9%a0","学习")
+            String path = this.getClass().getResource("/").getPath().replace("%e5%ad%a6%e4%b9%a0","学习")+ "static/"; //
             for(int i=0 ;i < urls.size();i++){
-                String urlString = (String) urls.get(0);
+                String urlString = (String) urls.get(i);
                 UUID uuid = UUID.randomUUID();
                 String id = uuid.toString();
                 download(urlString, id+".jpg",path);
@@ -177,8 +178,17 @@ public class douyinController {
     public static void download(String urlString, String filename,String savePath) throws Exception {
         try {
             // 构造URL
+            urlString = urlString.replace("https","http").replaceAll("amp;","").replace("253D","3D");
             URL url = new URL(urlString);
             // 打开连接
+
+//            Connection conn = Jsoup.connect(urlString).timeout(5000);
+//            conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//            conn.header("Accept-Encoding", "gzip, deflate, sdch");
+//            conn.header("Accept-Language", "zh-CN,zh;q=0.8");
+//            conn.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+//            conn.referrer("");
+//            Document doc = conn.get();
             URLConnection con = url.openConnection();
             //设置请求超时为5s
             con.setConnectTimeout(5*1000);
