@@ -3,7 +3,6 @@ package com.ergouzi.eurekaproducer.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ergouzi.eurekaproducer.utils.HttpUtils;
 import com.ergouzi.eurekaproducer.utils.ResultUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,10 +11,13 @@ import org.jsoup.select.Elements;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,19 @@ public class douyinController {
             if(jsonObject ==null){
                 return ResultUtil.error("解析抖音错误");
             }
+            //保存
+            JSONArray urls = jsonObject.getJSONArray("URL");
+            JSONArray array = new JSONArray();
+            String path = this.getClass().getResource("/").getPath()+ "static/"; //.replace("%e5%ad%a6%e4%b9%a0","学习")
+            for(int i=0 ;i < urls.size();i++){
+                String urlString = (String) urls.get(0);
+                UUID uuid = UUID.randomUUID();
+                String id = uuid.toString();
+                download(urlString, id+".jpg",path);
+                array.add("https://cloud.chenweidong.top/producer/images/"+id + ".jpg");
+            }
+            jsonObject.put("URL",array);
+
             return ResultUtil.success("success", jsonObject);
         }catch (Exception e){
             return ResultUtil.error("视频解析错误 ");
@@ -146,5 +161,49 @@ public class douyinController {
             System.out.println(e);
             return null;
         }
+    }
+
+
+
+
+
+    /**
+     *
+     * @param urlString 需要下载图片的路径
+     * @param filename  下载后图片的命名
+     * @param savePath  下载到那个文件夹下
+     * @throws Exception
+     */
+    public static void download(String urlString, String filename,String savePath) throws Exception {
+        try {
+            // 构造URL
+            URL url = new URL(urlString);
+            // 打开连接
+            URLConnection con = url.openConnection();
+            //设置请求超时为5s
+            con.setConnectTimeout(5*1000);
+            // 输入流
+            InputStream is = con.getInputStream();
+            // 1K的数据缓冲
+            byte[] bs = new byte[1024];
+            // 读取到的数据长度
+            int len;
+            // 输出的文件流
+            File sf=new File(savePath);
+            if(!sf.exists()){
+                sf.mkdirs();
+            }
+            OutputStream os = new FileOutputStream(sf +"/"+ filename);
+            // 开始读取
+            while ((len = is.read(bs)) != -1) {
+                os.write(bs, 0, len);
+            }
+            // 完毕，关闭所有链接
+            os.close();
+            is.close();
+        } catch (Exception e) {
+            System.out.println("报错了" + e);
+        }
+
     }
 }
