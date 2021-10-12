@@ -51,7 +51,7 @@ public class douyinController {
             //保存
             JSONArray urls = jsonObject.getJSONArray("URL");
             JSONArray array = new JSONArray();
-            String path = this.getClass().getResource("/").getPath().replace("%e5%ad%a6%e4%b9%a0","学习")+ "static/"; //
+            String path = "static/"; //
             for(int i=0 ;i < urls.size();i++){
                 String urlString = (String) urls.get(i);
                 UUID uuid = UUID.randomUUID();

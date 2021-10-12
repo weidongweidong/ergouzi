@@ -6,6 +6,8 @@ spring:
     name: eureka-producer
   mvc:
     static-path-pattern: /images/*
+  resources:
+    static-locations: static
 eureka:
   instance:
     hostname: 172.27.173.240 #线上
