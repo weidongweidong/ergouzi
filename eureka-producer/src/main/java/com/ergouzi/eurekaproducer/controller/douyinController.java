@@ -181,7 +181,6 @@ public class douyinController {
             urlString = urlString.replace("https","http").replaceAll("amp;","").replace("253D","3D");
             URL url = new URL(urlString);
             // 打开连接
-
 //            Connection conn = Jsoup.connect(urlString).timeout(5000);
 //            conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 //            conn.header("Accept-Encoding", "gzip, deflate, sdch");
@@ -203,6 +202,7 @@ public class douyinController {
             if(!sf.exists()){
                 sf.mkdirs();
             }
+            System.out.println("保存地址为"+ sf +"/"+ filename );
             OutputStream os = new FileOutputStream(sf +"/"+ filename);
             // 开始读取
             while ((len = is.read(bs)) != -1) {
