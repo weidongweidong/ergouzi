@@ -105,7 +105,6 @@ public class douyinController {
 
             //Jsoup.connect(url).ignoreContentType(true).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").timeout(5000).get();
             Document doc = Jsoup.connect(url).ignoreContentType(true).timeout(5000).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").referrer("").get();
-            System.out.println(doc.toString());
             Elements select = doc.select("#RENDER_DATA");
             String json = select.toString().replace("</script>","").replace("<script id=\"RENDER_DATA\" type=\"application/json\">","");
 
