@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -48,21 +49,24 @@ public class douyinController {
             if(jsonObject ==null){
                 return ResultUtil.error("解析抖音错误");
             }
-            if(jsonObject.getString("TYPE").equals("images")){
-                //保存
-                JSONArray urls = jsonObject.getJSONArray("URL");
-                String fileZui = ".jpg";
-                JSONArray array = new JSONArray();
-                String path = "static/";
-                for(int i=0 ;i < urls.size();i++){
-                    String urlString = (String) urls.get(i);
-                    UUID uuid = UUID.randomUUID();
-                    String id = uuid.toString();
-                    download(urlString, id+fileZui,path);
-                    array.add("https://cloud.chenweidong.top/producer/images/"+id + fileZui);
+
+            JSONArray urls = jsonObject.getJSONArray("URL");
+            JSONArray array = new JSONArray();
+            String path = "static/";
+            for(int i=0 ;i < urls.size();i++){
+                String urlString = (String) urls.get(i);
+                UUID uuid = UUID.randomUUID();
+                String id = uuid.toString();
+
+                if(jsonObject.getString("TYPE").equals("images")){
+                    download(urlString, id+".jpg",path);
+                    array.add("https://cloud.chenweidong.top/producer/images/"+id + ".jpg");
+                }else{
+                    download(urlString, id,path);
+                    array.add("https://cloud.chenweidong.top/producer/images/"+id + ".mp4");
                 }
-                jsonObject.put("URL",array);
             }
+            jsonObject.put("URL",array);
             return ResultUtil.success("success", jsonObject);
         }catch (Exception e){
             return ResultUtil.error("视频解析错误 ");
@@ -93,41 +97,8 @@ public class douyinController {
         JSONObject jsonObject = new JSONObject();
         try{
 
-            //Jsoup.connect(url).ignoreContentType(true).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").timeout(5000).get();
             Document doc = Jsoup.connect(url).ignoreContentType(true).timeout(5000).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").referrer("").get();
-            Elements select = doc.select("#RENDER_DATA");
-            String json = select.toString().replace("</script>","").replace("<script id=\"RENDER_DATA\" type=\"application/json\">","");
-
-            if(!"".equals(json)){
-                String str = URLDecoder.decode(json,"UTF-8");
-                JSONObject parse = JSON.parseObject(str);
-                JSONObject detail = null;
-                for(String str1 : parse.keySet()){
-                    Object o = parse.get(str1);
-                    if(!(o instanceof  JSONObject)){
-                        continue;
-                    }
-                    JSONObject jsonObject1 = parse.getJSONObject(str1);
-                    if(jsonObject1==null){
-                        continue;
-                    }
-                    JSONObject aweme = jsonObject1.getJSONObject("aweme");
-                    if(aweme == null){
-                        continue;
-                    }
-                    detail = aweme.getJSONObject("detail");
-                }
-                if(detail ==null){
-                    return null;
-                }
-                String desc = detail.getString("desc");
-                JSONObject palyUrl = (JSONObject) detail.getJSONObject("video").getJSONArray("playAddr").get(1);
-                String o = palyUrl.getString("src");
-                jsonObject.put("DESC",desc);
-                jsonObject.put("URL","https:"+o);
-                jsonObject.put("TYPE","video");
-                return jsonObject;
-            }
+            System.out.println(doc.toString());
             String location = doc.location();
             String rege  = "/\\d+/";
             Pattern pattern = Pattern.compile(rege, Pattern.CASE_INSENSITIVE);
@@ -139,8 +110,28 @@ public class douyinController {
                         urlMatcher.end(0)));
             }
             if(containedUrls.size() == 0){
-                return null;
+                HashMap<String, String> params = new HashMap<>();
+                params.put("url",url);
+                Connection connect = Jsoup.connect("https://www.chenshiyang.com/dytk/downloader");
+                connect.data(params);
+                Document post = connect.post();
+                System.out.println(post.toString());
+                Elements elementsByClass = post.getElementsByClass("btn btn-download");
+                Elements elementsByClass1 = post.getElementsByClass("card-text");
+                Element element = elementsByClass.get(0);
+                Element element1 = elementsByClass1.get(0);
+                String attr = element.attr("abs:href");
+                JSONArray array = new JSONArray();
+                array.add(attr);
+                jsonObject.put("TYPE","video");
+                jsonObject.put("URL",array);
+                jsonObject.put("DESC",element1.val());
+                return jsonObject;
             }
+
+
+
+
             String id = containedUrls.get(0);
             String substring = id.substring(1, id.length() - 1);
             String img_url = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + substring;
