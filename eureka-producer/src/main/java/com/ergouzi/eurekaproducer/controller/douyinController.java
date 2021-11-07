@@ -97,7 +97,7 @@ public class douyinController {
 
             Document doc = Jsoup.connect(url).ignoreContentType(true).timeout(5000).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").referrer("").get();
             String location = doc.location();
-            String rege  = "/\\d+/";
+            String rege  = "/\\d+[/|?]";
             Pattern pattern = Pattern.compile(rege, Pattern.CASE_INSENSITIVE);
             Matcher urlMatcher = pattern.matcher(location);
             List<String> containedUrls = new ArrayList<String>();
@@ -106,24 +106,9 @@ public class douyinController {
                 containedUrls.add(location.substring(urlMatcher.start(0),
                         urlMatcher.end(0)));
             }
-            if(containedUrls.size() == 0){
-                HashMap<String, String> params = new HashMap<>();
-                params.put("url",url);
-                Connection connect = Jsoup.connect("https://www.chenshiyang.com/dytk/downloader");
-                connect.data(params);
-                Document post = connect.post();
-                Elements elementsByClass = post.getElementsByClass("btn btn-download");
-                Elements elementsByClass1 = post.getElementsByClass("card-text");
-                Element element = elementsByClass.get(0);
-                Element element1 = elementsByClass1.get(0);
 
-                String attr = element.attr("abs:href");
-                JSONArray array = new JSONArray();
-                array.add(attr);
-                jsonObject.put("TYPE","video");
-                jsonObject.put("URL",array);
-                jsonObject.put("DESC",element1.html());
-                return jsonObject;
+            if(containedUrls.size() == 0){
+                return new JSONObject();
             }
 
 
@@ -140,14 +125,28 @@ public class douyinController {
             JSONObject data = item_list.getJSONObject(0);
             jsonObject.put("DESC",data.getString("desc"));
             JSONArray images = data.getJSONArray("images");
+            JSONObject video = data.getJSONObject("video");
             JSONArray array = new JSONArray();
-            for(int i=0 ;i < images.size() ; i++){
-                JSONObject jsonObject2 = images.getJSONObject(i);
-                JSONArray url_list = jsonObject2.getJSONArray("url_list");
-                array.add(url_list.get(0));
+            if(images!=null && images.size() > 0){
+                for(int i=0 ;i < images.size() ; i++){
+                    JSONObject jsonObject2 = images.getJSONObject(i);
+                    JSONArray url_list = jsonObject2.getJSONArray("url_list");
+                    array.add(url_list.get(0));
+                }
+                jsonObject.put("URL" ,array);
+                jsonObject.put("TYPE","images");
+            }else if(video != null  && video.getJSONObject("play_addr")!=null){
+                JSONObject play_addr = video.getJSONObject("play_addr");
+                JSONArray url_list = play_addr.getJSONArray("url_list");
+                if(url_list.size() > 0){
+                    String videoUrl = url_list.getString(0);
+                    JSONArray array1 = new JSONArray();
+                    array1.add(videoUrl);
+                    jsonObject.put("URL",array1);
+                    jsonObject.put("TYPE","video");
+                }
             }
-            jsonObject.put("URL" ,array);
-            jsonObject.put("TYPE","images");
+
             return jsonObject;
 
         }catch (Exception e){
