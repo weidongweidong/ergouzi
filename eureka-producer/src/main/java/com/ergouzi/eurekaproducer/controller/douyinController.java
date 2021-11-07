@@ -116,12 +116,13 @@ public class douyinController {
                 Elements elementsByClass1 = post.getElementsByClass("card-text");
                 Element element = elementsByClass.get(0);
                 Element element1 = elementsByClass1.get(0);
+
                 String attr = element.attr("abs:href");
                 JSONArray array = new JSONArray();
                 array.add(attr);
                 jsonObject.put("TYPE","video");
                 jsonObject.put("URL",array);
-                jsonObject.put("DESC",element1.val());
+                jsonObject.put("DESC",element1.html());
                 return jsonObject;
             }
 
