@@ -53,15 +53,20 @@ public class douyinController {
             String path = "static/";
             for(int i=0 ;i < urls.size();i++){
                 String urlString = (String) urls.get(i);
-                UUID uuid = UUID.randomUUID();
-                String id = uuid.toString();
-
                 if(jsonObject.getString("TYPE").equals("images")){
-                    download(urlString, id+".jpg",path);
-                    array.add("https://cloud.chenweidong.top/producer/images/"+id + ".jpg");
+                    String id = jsonObject.getString("ID");
+                    File file = new File(path + "/"+ id +"_"+ i + ".jpg");
+                    if(!file.exists()){
+                        download(urlString,  id +"_"+ i + ".jpg",path);
+                    }
+                    array.add("https://cloud.chenweidong.top/producer/images/"+ id +"_"+ i + ".jpg");
                 }else{
-                    download(urlString, id + ".mp4",path);
-                    array.add("https://cloud.chenweidong.top/producer/images/"+id + ".mp4");
+                    String id = jsonObject.getString("ID");
+                    File file = new File(path + "/"+ id +"_"+ i + ".mp4");
+                    if(!file.exists()){
+                        download(urlString, id +"_"+ i + ".mp4",path);
+                    }
+                    array.add("https://cloud.chenweidong.top/producer/images/"+id +"_"+ i + ".mp4");
                 }
             }
             jsonObject.put("URL",array);
@@ -115,8 +120,8 @@ public class douyinController {
 
 
             String id = containedUrls.get(0);
-            String substring = id.substring(1, id.length() - 1);
-            String img_url = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + substring;
+            id = id.substring(1, id.length() - 1);
+            String img_url = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + id ;
             Document doc1 = Jsoup.connect(img_url).ignoreContentType(true).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").get();
             Element body = doc1.body();
             String s = body.toString().replace("<body>","").replace("</body>","");
@@ -133,6 +138,7 @@ public class douyinController {
                     JSONArray url_list = jsonObject2.getJSONArray("url_list");
                     array.add(url_list.get(0));
                 }
+                jsonObject.put("ID",id);
                 jsonObject.put("URL" ,array);
                 jsonObject.put("TYPE","images");
             }else if(video != null  && video.getJSONObject("play_addr")!=null){
@@ -142,6 +148,7 @@ public class douyinController {
                     String videoUrl = url_list.getString(0);
                     JSONArray array1 = new JSONArray();
                     array1.add(videoUrl);
+                    jsonObject.put("ID",id);
                     jsonObject.put("URL",array1);
                     jsonObject.put("TYPE","video");
                 }
@@ -181,27 +188,7 @@ public class douyinController {
 //            Document doc = conn.get();
             URLConnection con = url.openConnection();
             System.out.println(con.toString());
-            if(con.toString().matches("(.*)chenshiyang(.*)")){
-                //设置请求超时为5s
-                con.setConnectTimeout(3 * 1000);
-                //防止屏蔽程序抓取而返回403错误
-                con.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-                Map<String, List<String>> map = con.getHeaderFields();
-                //遍历所有的响应头字段
-                for (String key : map.keySet()) {
-                    System.out.println(key + "--->" + map.get(key).get(0));
-                    if ("Location".equals(key)) {
-                        //获取新地址
-                        urlString = map.get(key).get(0);
-                        System.out.println("newUrl--->" + urlString);
-                        break;
-                    }
-                }
 
-                url = new URL(urlString);
-                //重新打开和URL之间的连接
-                con =  url.openConnection();
-            }
 
             // 输入流
             InputStream is = con.getInputStream();
