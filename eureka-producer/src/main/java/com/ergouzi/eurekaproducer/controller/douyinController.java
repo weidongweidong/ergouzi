@@ -12,14 +12,12 @@ import org.jsoup.select.Elements;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;    
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +60,7 @@ public class douyinController {
                     download(urlString, id+".jpg",path);
                     array.add("https://cloud.chenweidong.top/producer/images/"+id + ".jpg");
                 }else{
-                    download(urlString, id,path);
+                    download(urlString, id + ".mp4",path);
                     array.add("https://cloud.chenweidong.top/producer/images/"+id + ".mp4");
                 }
             }
@@ -98,7 +96,6 @@ public class douyinController {
         try{
 
             Document doc = Jsoup.connect(url).ignoreContentType(true).timeout(5000).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").referrer("").get();
-            System.out.println(doc.toString());
             String location = doc.location();
             String rege  = "/\\d+/";
             Pattern pattern = Pattern.compile(rege, Pattern.CASE_INSENSITIVE);
@@ -115,7 +112,6 @@ public class douyinController {
                 Connection connect = Jsoup.connect("https://www.chenshiyang.com/dytk/downloader");
                 connect.data(params);
                 Document post = connect.post();
-                System.out.println(post.toString());
                 Elements elementsByClass = post.getElementsByClass("btn btn-download");
                 Elements elementsByClass1 = post.getElementsByClass("card-text");
                 Element element = elementsByClass.get(0);
@@ -184,8 +180,29 @@ public class douyinController {
 //            conn.referrer("");
 //            Document doc = conn.get();
             URLConnection con = url.openConnection();
-            //设置请求超时为5s
-            con.setConnectTimeout(5*1000);
+            System.out.println(con.toString());
+            if(con.toString().matches("(.*)chenshiyang(.*)")){
+                //设置请求超时为5s
+                con.setConnectTimeout(3 * 1000);
+                //防止屏蔽程序抓取而返回403错误
+                con.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+                Map<String, List<String>> map = con.getHeaderFields();
+                //遍历所有的响应头字段
+                for (String key : map.keySet()) {
+                    System.out.println(key + "--->" + map.get(key).get(0));
+                    if ("Location".equals(key)) {
+                        //获取新地址
+                        urlString = map.get(key).get(0);
+                        System.out.println("newUrl--->" + urlString);
+                        break;
+                    }
+                }
+
+                url = new URL(urlString);
+                //重新打开和URL之间的连接
+                con =  url.openConnection();
+            }
+
             // 输入流
             InputStream is = con.getInputStream();
             // 1K的数据缓冲
