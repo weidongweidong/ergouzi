@@ -3,6 +3,7 @@ package com.ergouzi.eurekaproducer.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ergouzi.eurekaproducer.utils.HttpUtils;
 import com.ergouzi.eurekaproducer.utils.ResultUtil;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -141,16 +142,30 @@ public class douyinController {
                 jsonObject.put("ID",id);
                 jsonObject.put("URL" ,array);
                 jsonObject.put("TYPE","images");
-            }else if(video != null  && video.getJSONObject("play_addr")!=null){
-                JSONObject play_addr = video.getJSONObject("play_addr");
-                JSONArray url_list = play_addr.getJSONArray("url_list");
-                if(url_list.size() > 0){
-                    String videoUrl = url_list.getString(0);
+            }
+//            else if(video != null  && video.getJSONObject("play_addr")!=null){
+//
+//                JSONObject play_addr = video.getJSONObject("play_addr");
+//                JSONArray url_list = play_addr.getJSONArray("url_list");
+//                if(url_list.size() > 0){
+//                    String videoUrl = url_list.getString(0);
+//                    JSONArray array1 = new JSONArray();
+//                    array1.add(videoUrl);
+//                    jsonObject.put("ID",id);
+//                    jsonObject.put("URL",array1);
+//                    jsonObject.put("TYPE","video");
+//                }
+//            }
+            else{
+                url = "https://api.missuo.me/douyin?url=" + url;
+                String request = HttpUtils.getRequest(url);
+                JSONObject result = JSON.parseObject(request);
+                if(result.getInteger("code") == 200 ){
+                    jsonObject.put("ID", result.getString("id"));
                     JSONArray array1 = new JSONArray();
-                    array1.add(videoUrl);
-                    jsonObject.put("ID",id);
+                    array1.add(result.getString("mp4"));
                     jsonObject.put("URL",array1);
-                    jsonObject.put("TYPE","video");
+                    jsonObject.put("TYPE", "video");
                 }
             }
 
