@@ -63,13 +63,13 @@ public class douyinController {
                     }
                     array.add("https://cloud.chenweidong.top/producer/images/"+ id +"_"+ i + ".jpg");
                 }else{
-//                    String id = jsonObject.getString("ID");
-//                    File file = new File(path + "/"+ id +"_"+ i + ".mp4");
-//                    if(!file.exists()){
-//                        download("video",urlString, id +"_"+ i + ".mp4",path);
-//                    }
-//                    array.add("https://cloud.chenweidong.top/producer/images/"+id +"_"+ i + ".mp4");
-                    array.add(urlString);
+                    String id = jsonObject.getString("ID");
+                    File file = new File(path + "/"+ id +"_"+ i + ".mp4");
+                    if(!file.exists()){
+                        download("video",urlString, id +"_"+ i + ".mp4",path);
+                    }
+                    array.add("https://cloud.chenweidong.top/producer/images/"+id +"_"+ i + ".mp4");
+//                    array.add(urlString);
                 }
             }
             jsonObject.put("URL",array);
@@ -199,7 +199,9 @@ public class douyinController {
                 urlString = urlString.replace("https","http").replaceAll("amp;","").replace("253D","3D");
             }
             URL url = new URL(urlString);
-            url.openConnection().setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)");
+            //Document doc = Jsoup.connect(urlString).ignoreContentType(true).timeout(5000).userAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)").referrer("").get();
+
+//            url.openConnection().setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)");
             // 打开连接
 //            Connection conn = Jsoup.connect(urlString).timeout(5000);
 //            conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
@@ -209,6 +211,8 @@ public class douyinController {
 //            conn.referrer("");
 //            Document doc = conn.get();
             URLConnection con = url.openConnection();
+            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)");
+            con.setReadTimeout(500);
             System.out.println(con.toString());
 
 
