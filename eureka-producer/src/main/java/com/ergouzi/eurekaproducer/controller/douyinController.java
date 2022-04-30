@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ergouzi.eurekaproducer.utils.HttpUtils;
 import com.ergouzi.eurekaproducer.utils.ResultUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -58,16 +59,17 @@ public class douyinController {
                     String id = jsonObject.getString("ID");
                     File file = new File(path + "/"+ id +"_"+ i + ".jpg");
                     if(!file.exists()){
-                        download(urlString,  id +"_"+ i + ".jpg",path);
+                        download("images",urlString,  id +"_"+ i + ".jpg",path);
                     }
                     array.add("https://cloud.chenweidong.top/producer/images/"+ id +"_"+ i + ".jpg");
                 }else{
-                    String id = jsonObject.getString("ID");
-                    File file = new File(path + "/"+ id +"_"+ i + ".mp4");
-                    if(!file.exists()){
-                        download(urlString, id +"_"+ i + ".mp4",path);
-                    }
-                    array.add("https://cloud.chenweidong.top/producer/images/"+id +"_"+ i + ".mp4");
+//                    String id = jsonObject.getString("ID");
+//                    File file = new File(path + "/"+ id +"_"+ i + ".mp4");
+//                    if(!file.exists()){
+//                        download("video",urlString, id +"_"+ i + ".mp4",path);
+//                    }
+//                    array.add("https://cloud.chenweidong.top/producer/images/"+id +"_"+ i + ".mp4");
+                    array.add(urlString);
                 }
             }
             jsonObject.put("URL",array);
@@ -163,7 +165,9 @@ public class douyinController {
                 if(result.getInteger("code") == 200 ){
                     jsonObject.put("ID", result.getString("id"));
                     JSONArray array1 = new JSONArray();
-                    array1.add(result.getString("mp4"));
+                    String videoUrl = result.getString("mp4");
+                    videoUrl.replace("http","https");
+                    array1.add(videoUrl);
                     jsonObject.put("URL",array1);
                     jsonObject.put("TYPE", "video");
                 }
@@ -188,11 +192,14 @@ public class douyinController {
      * @param savePath  下载到那个文件夹下
      * @throws Exception
      */
-    public static void download(String urlString, String filename,String savePath) throws Exception {
+    public static void download(String type , String urlString, String filename,String savePath) throws Exception {
         try {
             // 构造URL
-            urlString = urlString.replace("https","http").replaceAll("amp;","").replace("253D","3D");
+            if(!"video".equals(type)){
+                urlString = urlString.replace("https","http").replaceAll("amp;","").replace("253D","3D");
+            }
             URL url = new URL(urlString);
+            url.openConnection().setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)");
             // 打开连接
 //            Connection conn = Jsoup.connect(urlString).timeout(5000);
 //            conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
