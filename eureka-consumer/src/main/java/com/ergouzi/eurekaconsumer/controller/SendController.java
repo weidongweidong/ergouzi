@@ -62,8 +62,6 @@ public class SendController {
             templateMessage.addData(new WxMpTemplateData("fx", forecast.getJSONObject(0).getString("fx") ,"#00BFFF"));
             templateMessage.addData(new WxMpTemplateData("fl", forecast.getJSONObject(0).getString("fl") ,"#00BFFF"));
             templateMessage.addData(new WxMpTemplateData("notice", forecast.getJSONObject(0).getString("notice") ,"#00BFFF"));
-
-
             System.out.println(templateMessage.toJson());
         }
         try {
@@ -108,6 +106,32 @@ public class SendController {
 
     }
 
+
+    @Scheduled(cron = "0 30 9 * * ? ")
+    public void push2() {
+        //1，配置
+        WxMpInMemoryConfigStorage wxStorage = new WxMpInMemoryConfigStorage();
+        wxStorage.setAppId(appID);
+        wxStorage.setSecret(appsecret);
+        WxMpService wxMpService = new WxMpServiceImpl();
+        wxMpService.setWxMpConfigStorage(wxStorage);
+        //2,推送消息
+        WxMpTemplateMessage templateMessage = WxMpTemplateMessage.builder()
+                .toUser("oyB1H6phb2WXgXjHux5NbgHu70T0")
+                .templateId("zdRuwg5ZvDUuPyEiXzOqMVmZpyp96ooBubXslDtBp-E")
+                .build();
+
+        String res = HttpUtil.get("https://api.oick.cn/dutang/api.php");
+        templateMessage.addData(new WxMpTemplateData("content", res ,"#00BFFF"));
+        try {
+            String s = wxMpService.getTemplateMsgService().sendTemplateMsg(templateMessage);
+            System.out.println(s);
+        } catch (Exception e) {
+            System.out.println("推送失败：" + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
 
 
 
