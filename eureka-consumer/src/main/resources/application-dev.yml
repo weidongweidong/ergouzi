@@ -12,3 +12,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+wx:
+  appID: wx6b902926a70cc260
+  appsecret: c8b0561fcd8a7e251d8bfff6b1102880
