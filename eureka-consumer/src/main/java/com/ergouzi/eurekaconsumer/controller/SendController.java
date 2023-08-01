@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -107,7 +108,7 @@ public class SendController {
     }
 
 
-    @Scheduled(cron = "0 30 9 * * ? ")
+    @Scheduled(initialDelay = 1000 * 60 , fixedDelay = 1000 * 60 * 60)
     public void push2() {
         //1，配置
         WxMpInMemoryConfigStorage wxStorage = new WxMpInMemoryConfigStorage();
@@ -118,11 +119,18 @@ public class SendController {
         //2,推送消息
         WxMpTemplateMessage templateMessage = WxMpTemplateMessage.builder()
                 .toUser("oyB1H6phb2WXgXjHux5NbgHu70T0")
-                .templateId("zdRuwg5ZvDUuPyEiXzOqMVmZpyp96ooBubXslDtBp-E")
+                .templateId("GNBpygNr1EsKWqiMAzSBY4BpnYdAaFpuv2az1HqVn3A")
                 .build();
 
         String res = HttpUtil.get("https://api.oick.cn/dutang/api.php");
-        templateMessage.addData(new WxMpTemplateData("content", res ,"#00BFFF"));
+        int count = 1;
+        String[] strings = strToStrArray(res, 17);
+        for (String string : strings) {
+            templateMessage.addData(new WxMpTemplateData("content" + count, string ,"#00BFFF"));
+            count++;
+        }
+
+
         try {
             String s = wxMpService.getTemplateMsgService().sendTemplateMsg(templateMessage);
             System.out.println(s);
@@ -163,6 +171,34 @@ public class SendController {
             return ip;
         }
         return request.getRemoteAddr();
+    }
+
+
+
+    /*
+     * 将字符串按照指定长度分割成字符串数组
+     * @return
+     */
+    public static String[] strToStrArray(String src, int length) {
+        //检查参数是否合法
+        if (null == src || src.equals("")) {
+            return null;
+        }
+        if (length <= 0) {
+            return null;
+        }
+
+        //获取整个字符串可以被切割成字符子串的个数
+        int n = (src.length() + length - 1) / length;
+        String[] split = new String[n];
+        for (int i = 0; i < n; i++) {
+            if (i < (n - 1)) {
+                split[i] = src.substring(i * length, (i + 1) * length);
+            } else {
+                split[i] = src.substring(i * length);
+            }
+        }
+        return split;
     }
 
 

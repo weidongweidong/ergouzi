@@ -3,6 +3,7 @@ FROM maven:3.5-jdk-8
 COPY ./ /spring-cloud-ergouzi
 RUN chmod a+x /spring-cloud-ergouzi/eureka-consumer/entrypoint.sh
 EXPOSE 8763
+RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
 WORKDIR /spring-cloud-ergouzi/eureka-consumer/
 CMD /spring-cloud-ergouzi/eureka-consumer/entrypoint.sh pro
 
